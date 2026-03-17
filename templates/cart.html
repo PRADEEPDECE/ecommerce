@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Shopping Cart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-black: #111111;
+            --accent-gray: #f6f6f6;
+            --border-color: #eeeeee;
+            --transition: all 0.2s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+            color: var(--primary-black);
+        }
+
+        .cart-container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        .cart-header {
+            border-bottom: 2px solid var(--primary-black);
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .cart-header h1 {
+            font-weight: 800;
+            text-transform: uppercase;
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        /* Updated Cart Item Row for Thumbnails */
+        .cart-item {
+            display: grid;
+            grid-template-columns: 100px 2fr 1fr 1fr; /* Image, Name, Qty, Remove */
+            align-items: center;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .cart-item img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            background: var(--accent-gray);
+            border-radius: 4px;
+        }
+
+        .item-info h3 {
+            margin: 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        /* Quantity Controls */
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .qty-btn {
+            text-decoration: none;
+            color: var(--primary-black);
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: var(--transition);
+        }
+
+        .qty-btn:hover {
+            background-color: var(--primary-black);
+            color: #fff;
+        }
+
+        .qty-text {
+            font-weight: 700;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* Remove Link */
+        .remove-link {
+            text-align: right;
+            color: #ff4444;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .remove-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Summary Area */
+        .cart-summary {
+            margin-top: 40px;
+            text-align: right;
+            padding: 30px;
+            background-color: var(--accent-gray);
+            border-radius: 8px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: flex-end;
+            align-items: baseline;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .total-label {
+            font-size: 1rem;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .total-amount {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        /* Checkout Button Styling */
+        .btn-checkout {
+            display: inline-block;
+            background: var(--primary-black);
+            color: white;
+            text-decoration: none;
+            padding: 18px 50px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+        }
+
+        .btn-checkout:hover {
+            background: #333;
+            transform: translateY(-2px);
+        }
+
+        .btn-back {
+            text-decoration: none;
+            color: var(--primary-black);
+            font-weight: 700;
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 600px) {
+            .cart-item {
+                grid-template-columns: 80px 1fr;
+                gap: 15px;
+            }
+            .quantity-controls, .remove-link {
+                grid-column: 1 / -1; /* Stretch to full width on mobile */
+                justify-content: center;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="cart-container">
+    <div class="cart-header">
+        <h1>Your Cart</h1>
+        <a href="/" class="btn-back">← Continue Shopping</a>
+    </div>
+
+    {% for item in items %}
+    <div class="cart-item">
+        <div class="item-img">
+            <img src="{{ item.product.image }}" alt="{{ item.product.name }}" />
+        </div>
+
+        <div class="item-info">
+            <h3>{{ item.product.name }}</h3>
+        </div>
+
+        <div class="quantity-controls">
+            <a href="/update/{{ item.id }}/decrease/" class="qty-btn">-</a>
+            <span class="qty-text">{{ item.quantity }}</span>
+            <a href="/update/{{ item.id }}/increase/" class="qty-btn">+</a>
+        </div>
+
+        <a href="/remove/{{ item.id }}/" class="remove-link">Remove</a>
+    </div>
+    {% endfor %}
+
+    <div class="cart-summary">
+        <div class="total-row">
+            <span class="total-label">Total</span>
+            <span class="total-amount">Rs{{ total }}</span>
+        </div>
+       <a href="/checkout/" class="btn-checkout" id="checkoutBtn">Checkout Now</a>
+    </div>
+</div>
+<script>
+    document.getElementById('checkoutBtn').addEventListener('click', function(event) {
+        // 1. Prevent the link from actually going to /checkout/
+        event.preventDefault();
+
+        // 2. Show the alert
+        alert('Thank you for your order! Purchase successful.');
+
+        // 3. Optional: Redirect to the home page after they click 'OK'
+        // window.location.href = "/";
+    });
+</script>
+</body>
+</html>
